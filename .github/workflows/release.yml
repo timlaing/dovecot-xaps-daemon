@@ -1,0 +1,101 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish Debian package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Validate release version
+        shell: bash
+        run: |
+          version=${GITHUB_REF_NAME#v}
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Release tags must use the form vMAJOR.MINOR.PATCH" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_ENV"
+
+      - name: Install Go
+        uses: actions/setup-go@v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install Debian packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes debhelper devscripts golang-any lintian
+
+      - name: Test
+        run: go test ./...
+
+      - name: Build Debian package
+        shell: bash
+        env:
+          DEBEMAIL: noreply@github.com
+          DEBFULLNAME: dovecot-xaps-daemon contributors
+        run: |
+          install -d dist
+          dch --newversion "$version" --distribution stable \
+            "Release $GITHUB_REF_NAME."
+          dpkg-buildpackage --build=binary --no-sign
+          mv ../xapsd_*.deb dist/
+
+      - name: Inspect Debian package
+        shell: bash
+        run: |
+          package=$(find dist -maxdepth 1 -name '*.deb' -print -quit)
+          test -n "$package"
+          dpkg-deb --info "$package"
+          dpkg-deb --contents "$package"
+          lintian --fail-on error "$package"
+
+      - name: Generate checksums
+        run: cd dist && sha256sum *.deb > SHA256SUMS
+
+      - name: Generate SPDX SBOM
+        uses: anchore/sbom-action@v0.24.2
+        with:
+          path: dist
+          format: spdx-json
+          output-file: dist/xapsd-${{ env.version }}.spdx.json
+          upload-artifact: false
+          upload-release-assets: false
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: xapsd-${{ env.version }}
+          path: |
+            dist/*.deb
+            dist/SHA256SUMS
+            dist/*.spdx.json
+          if-no-files-found: error
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          if ! gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "Release Drafter did not create a draft for $GITHUB_REF_NAME" >&2
+            exit 1
+          fi
+          gh release upload "$GITHUB_REF_NAME" \
+            dist/*.deb dist/SHA256SUMS dist/*.spdx.json --clobber
+          gh release edit "$GITHUB_REF_NAME" \
+            --draft=false \
+            --latest \
+            --title "$GITHUB_REF_NAME"

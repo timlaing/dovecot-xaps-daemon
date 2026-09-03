@@ -1,0 +1,71 @@
+name: Bug report
+description: Report a problem with the xapsd daemon
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Remove APNS keys, credentials, device tokens, account IDs, and private mail data.
+
+  - type: input
+    id: daemon-version
+    attributes:
+      label: xapsd version
+      description: Release version, Debian package version, or commit SHA
+      placeholder: "e.g. 1.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating system
+      placeholder: "e.g. Ubuntu 26.04 amd64"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: installation
+    attributes:
+      label: Installation method
+      options:
+        - Debian package
+        - Built from source
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Dovecot XAPS plugin version
+      description: Include this when the problem involves communication with Dovecot.
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: What happened, and what did you expect?
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Relevant xapsd configuration
+      description: Paste relevant settings from xapsd.yaml after removing all sensitive values.
+      render: yaml
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Paste `journalctl -u xapsd` output after removing private data.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context

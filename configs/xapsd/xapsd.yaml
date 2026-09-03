@@ -49,6 +49,6 @@ keyFileP8:
 # APNS topic
 keyFileTopic: com.apple.mail.nil
 # KeyID from developer account (Certificates, Identifiers & Profiles -> Keys)
-keyFileKeyId: ABCDEFGH
+keyFileKeyId:
 # TeamID from developer account (View Account -> Membership)
-keyFileTeamId: ABCDEFGH
+keyFileTeamId:

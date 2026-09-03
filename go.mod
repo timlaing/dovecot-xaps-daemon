@@ -1,4 +1,4 @@
-module github.com/freswa/dovecot-xaps-daemon
+module github.com/timlaing/dovecot-xaps-daemon
 
 go 1.25.0
 

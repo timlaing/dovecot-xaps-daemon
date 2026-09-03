@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: dovecot-xaps-plugin issues
+    url: https://github.com/timlaing/dovecot-xaps-plugin/issues
+    about: Report Dovecot plugin loading, configuration, or XAPPLEPUSHSERVICE problems in the plugin repository

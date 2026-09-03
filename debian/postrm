@@ -1,0 +1,17 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = purge ]; then
+    rm -f /etc/xapsd/xapsd.yaml
+    rmdir --ignore-fail-on-non-empty /etc/xapsd 2>/dev/null || true
+
+    if [ -f /usr/share/debconf/confmodule ]; then
+        . /usr/share/debconf/confmodule
+        db_purge
+        db_stop
+    fi
+fi
+
+#DEBHELPER#
+
+exit 0

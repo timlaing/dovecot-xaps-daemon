@@ -1,0 +1,40 @@
+#!/bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+
+if [ "$1" = configure ]; then
+    systemd-sysusers /usr/lib/sysusers.d/xapsd.conf
+    systemd-tmpfiles --create /usr/lib/tmpfiles.d/xapsd.conf
+
+    config=/etc/xapsd/xapsd.yaml
+    if [ ! -e "$config" ]; then
+        db_get xapsd/key-file-topic
+        topic=$RET
+        db_get xapsd/key-file-key-id
+        key_id=$RET
+        db_get xapsd/key-file-team-id
+        team_id=$RET
+
+        case "$topic" in ''|*[!A-Za-z0-9._-]*) echo "xapsd: invalid APNS topic" >&2; exit 1;; esac
+        case "$key_id" in ''|*[!A-Za-z0-9]*) echo "xapsd: invalid APNS key ID" >&2; exit 1;; esac
+        case "$team_id" in ''|*[!A-Za-z0-9]*) echo "xapsd: invalid team ID" >&2; exit 1;; esac
+
+        install -d -o root -g xapsd -m 0750 /etc/xapsd
+        install -o root -g xapsd -m 0640 /usr/share/xapsd/xapsd.yaml "$config"
+        sed -i \
+            -e "s|^keyFileP8:.*$|keyFileP8: AuthKey_${key_id}.p8|" \
+            -e "s|^keyFileTopic:.*$|keyFileTopic: ${topic}|" \
+            -e "s|^keyFileKeyId:.*$|keyFileKeyId: ${key_id}|" \
+            -e "s|^keyFileTeamId:.*$|keyFileTeamId: ${team_id}|" \
+            "$config"
+    else
+        echo "xapsd: preserving existing $config"
+    fi
+fi
+
+db_stop
+
+#DEBHELPER#
+
+exit 0

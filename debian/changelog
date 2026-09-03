@@ -1,0 +1,5 @@
+xapsd (0.0.0) UNRELEASED; urgency=medium
+
+  * Initial Debian packaging for the timlaing fork.
+
+ -- dovecot-xaps-daemon contributors <noreply@github.com>  Thu, 03 Sep 2026 00:00:00 +0100

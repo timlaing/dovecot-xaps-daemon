@@ -1,0 +1,16 @@
+Template: xapsd/key-file-topic
+Type: string
+_Description: APNS topic:
+ Enter the application bundle identifier used as the Apple Push Notification
+ Service topic.
+
+Template: xapsd/key-file-key-id
+Type: string
+_Description: Apple APNS key ID:
+ Enter the key ID shown for the APNS authentication key in the Apple Developer
+ portal.
+
+Template: xapsd/key-file-team-id
+Type: string
+_Description: Apple Developer team ID:
+ Enter the team ID associated with the APNS authentication key.
