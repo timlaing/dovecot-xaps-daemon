@@ -10,12 +10,25 @@ permissions:
 
 jobs:
   release:
-    name: Build and publish Debian package
+    name: Build and publish Debian package (${{ matrix.arch }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            triplet: x86_64-linux-gnu
+          - arch: arm64
+            triplet: aarch64-linux-gnu
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v7.0.1
+
+      - name: Set up QEMU for cross-architecture builds
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
 
       - name: Validate release version
         shell: bash
@@ -36,7 +49,7 @@ jobs:
       - name: Install Debian packaging tools
         run: |
           sudo apt-get update
-          sudo apt-get install --yes build-essential debhelper devscripts golang-any lintian
+          sudo apt-get install --yes build-essential crossbuild-essential-${{ matrix.arch }} debhelper devscripts dpkg-dev golang-any lintian
 
       - name: Test
         run: go test ./...
@@ -46,12 +59,13 @@ jobs:
         env:
           DEBEMAIL: noreply@github.com
           DEBFULLNAME: dovecot-xaps-daemon contributors
+          DEB_BUILD_OPTIONS: nocheck
         run: |
           install -d dist
           dch --newversion "$version" --distribution stable \
             "Release $GITHUB_REF_NAME."
-          dpkg-buildpackage --build=binary --no-sign
-          mv ../xapsd_*.deb dist/
+          dpkg-buildpackage --build=binary --no-sign --host-arch "${{ matrix.arch }}"
+          mv "../xapsd_*_${{ matrix.arch }}.deb" dist/
 
       - name: Inspect Debian package
         shell: bash
@@ -62,27 +76,37 @@ jobs:
           dpkg-deb --contents "$package"
           lintian --fail-on error "$package"
 
-      - name: Generate checksums
-        run: cd dist && sha256sum *.deb > SHA256SUMS
-
       - name: Generate SPDX SBOM
         uses: anchore/sbom-action@v0.24.2
         with:
           path: dist
           format: spdx-json
-          output-file: dist/xapsd-${{ env.version }}.spdx.json
+          output-file: dist/xapsd-${{ env.version }}-${{ matrix.arch }}.spdx.json
           upload-artifact: false
           upload-release-assets: false
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v7.0.1
         with:
-          name: xapsd-${{ env.version }}
+          name: xapsd-${{ env.version }}-${{ matrix.arch }}
           path: |
             dist/*.deb
-            dist/SHA256SUMS
             dist/*.spdx.json
           if-no-files-found: error
+
+  publish:
+    name: Generate checksums and publish release
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v7.0.1
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Generate checksums
+        run: cd dist && sha256sum *.deb > SHA256SUMS
 
       - name: Create GitHub release
         env:
