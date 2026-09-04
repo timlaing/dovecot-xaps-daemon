@@ -73,3 +73,5 @@ fabric.properties
 # Generated test working copies
 internal/database/testdata/database_workingcpy.json
 
+# Local environment / secrets (never commit)
+.env
