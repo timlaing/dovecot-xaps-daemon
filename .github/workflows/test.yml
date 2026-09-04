@@ -47,7 +47,7 @@ jobs:
       - name: Install Debian packaging tools
         run: |
           sudo apt-get update
-          sudo apt-get install --yes debhelper golang-any lintian
+          sudo apt-get install --yes build-essential debhelper golang-any lintian
 
       - name: Build package
         run: dpkg-buildpackage --build=binary --no-sign
