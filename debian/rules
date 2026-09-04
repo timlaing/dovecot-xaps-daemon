@@ -4,6 +4,7 @@
 	dh $@
 
 override_dh_auto_build:
+	mkdir -p build
 	go build -trimpath -ldflags="-s -w" -o build/xapsd ./cmd/xapsd
 
 override_dh_auto_test:
