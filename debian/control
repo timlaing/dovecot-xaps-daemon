@@ -1,0 +1,16 @@
+Source: xapsd
+Section: mail
+Priority: optional
+Maintainer: dovecot-xaps-daemon contributors <noreply@github.com>
+Build-Depends: debhelper-compat (= 13), golang-any
+Standards-Version: 4.7.2
+Homepage: https://github.com/timlaing/dovecot-xaps-daemon
+Rules-Requires-Root: no
+
+Package: xapsd
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}, debconf (>= 0.5) | debconf-2.0
+Recommends: dovecot-xaps-plugin
+Description: Apple push notification daemon for Dovecot
+ Receives mail events from the Dovecot XAPS plugin and sends native Apple Push
+ Notification Service notifications to registered devices.

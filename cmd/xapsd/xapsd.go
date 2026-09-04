@@ -31,10 +31,10 @@ import (
 	"encoding/hex"
 	"flag"
 	"fmt"
-	"github.com/freswa/dovecot-xaps-daemon/internal"
-	"github.com/freswa/dovecot-xaps-daemon/internal/config"
-	"github.com/freswa/dovecot-xaps-daemon/internal/database"
 	log "github.com/sirupsen/logrus"
+	"github.com/timlaing/dovecot-xaps-daemon/internal"
+	"github.com/timlaing/dovecot-xaps-daemon/internal/config"
+	"github.com/timlaing/dovecot-xaps-daemon/internal/database"
 	"os"
 	"strings"
 )

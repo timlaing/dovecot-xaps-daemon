@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/freswa/dovecot-xaps-daemon/internal/config"
-	"github.com/freswa/dovecot-xaps-daemon/internal/database"
 	"github.com/julienschmidt/httprouter"
 	log "github.com/sirupsen/logrus"
+	"github.com/timlaing/dovecot-xaps-daemon/internal/config"
+	"github.com/timlaing/dovecot-xaps-daemon/internal/database"
 )
 
 type httpHandler struct {

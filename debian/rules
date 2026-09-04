@@ -1,0 +1,14 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	mkdir -p build
+	go build -trimpath -ldflags="-s -w" -o build/xapsd ./cmd/xapsd
+
+override_dh_auto_test:
+	go test ./...
+
+override_dh_installchangelogs:
+	dh_installchangelogs -XCHANGELOG.md

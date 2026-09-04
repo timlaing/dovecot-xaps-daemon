@@ -9,12 +9,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/freswa/dovecot-xaps-daemon/internal/config"
-	"github.com/freswa/dovecot-xaps-daemon/internal/database"
 	"github.com/sideshow/apns2"
 	"github.com/sideshow/apns2/certificate"
 	"github.com/sideshow/apns2/token"
 	log "github.com/sirupsen/logrus"
+	"github.com/timlaing/dovecot-xaps-daemon/internal/config"
+	"github.com/timlaing/dovecot-xaps-daemon/internal/database"
 )
 
 const (

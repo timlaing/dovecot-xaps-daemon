@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+
+db_input high xapsd/key-file-topic || true
+db_input high xapsd/key-file-key-id || true
+db_input high xapsd/key-file-team-id || true
+db_go
