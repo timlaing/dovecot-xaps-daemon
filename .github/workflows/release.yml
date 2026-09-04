@@ -113,7 +113,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          if ! gh release list --json tagName --jq '.[].tagName' | grep -qx "$GITHUB_REF_NAME"; then
+          if ! gh api "repos/${{ github.repository }}/releases" --jq '.[].tag_name' | grep -qx "$GITHUB_REF_NAME"; then
             echo "Release Drafter did not create a draft for $GITHUB_REF_NAME" >&2
             exit 1
           fi
