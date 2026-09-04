@@ -65,7 +65,7 @@ jobs:
           dch --newversion "$version" --distribution stable \
             "Release $GITHUB_REF_NAME."
           dpkg-buildpackage --build=binary --no-sign --host-arch "${{ matrix.arch }}" -d
-          mv "../xapsd_*_${{ matrix.arch }}.deb" dist/
+          mv ../xapsd_*_${{ matrix.arch }}.deb dist/
 
       - name: Inspect Debian package
         shell: bash
