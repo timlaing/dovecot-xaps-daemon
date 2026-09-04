@@ -69,3 +69,7 @@ fabric.properties
 
 # macOS
 .DS_Store
+
+# Generated test working copies
+internal/database/testdata/database_workingcpy.json
+
