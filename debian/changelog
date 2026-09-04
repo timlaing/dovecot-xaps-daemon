@@ -1,5 +1,12 @@
-xapsd (0.0.0) UNRELEASED; urgency=medium
+xapsd (1.4.0) stable; urgency=medium
 
-  * Initial Debian packaging for the timlaing fork.
+  * First release from the timlaing fork.
+  * Debian packaging for amd64 and arm64 with interactive APNS configuration.
+  * Unit tests with 85.4% statement coverage.
+  * Security fixes for CVE-2023-45288, CVE-2024-45338, CVE-2024-51744,
+    CVE-2025-22870, and GHSA-fv92-fjc5-jj9h.
+  * Dependency updates for golang.org/x/net and golang.org/x/crypto.
+  * Removed deprecated Apple self-service push certificate API.
+  * CI/CD automation for linting, SonarQube Cloud, and release publishing.
 
- -- dovecot-xaps-daemon contributors <noreply@github.com>  Thu, 03 Sep 2026 00:00:00 +0100
+ -- dovecot-xaps-daemon contributors <noreply@github.com>  Thu, 04 Sep 2026 00:00:00 +0100
