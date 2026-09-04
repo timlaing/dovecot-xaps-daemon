@@ -1,0 +1,2 @@
+# Go binaries are compiled statically by default; this is intentional.
+statically-linked-binary
