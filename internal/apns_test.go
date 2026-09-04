@@ -11,12 +11,14 @@ import (
 	"math/big"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/sideshow/apns2"
 	log "github.com/sirupsen/logrus"
+	"github.com/timlaing/dovecot-xaps-daemon/internal/config"
 	"github.com/timlaing/dovecot-xaps-daemon/internal/database"
 )
 
@@ -133,6 +135,98 @@ func newAPNSMockClient(t *testing.T, statusCode int) (*Apns, *httptest.Server) {
 	}))
 	client := &apns2.Client{Host: server.URL, HTTPClient: http.DefaultClient}
 	return newTestApns(client), server
+}
+
+// withConfigDir sets the config directory to a fresh temp directory for the
+// duration of the test, restoring the original value on cleanup.
+func withConfigDir(t *testing.T) string {
+	t.Helper()
+	dir := t.TempDir() + string(os.PathSeparator)
+	orig := xapsdConfigDir
+	xapsdConfigDir = dir
+	t.Cleanup(func() { xapsdConfigDir = orig })
+	return dir
+}
+
+func TestNewApnsPem(t *testing.T) {
+	dir := withConfigDir(t)
+
+	cert := newSelfSignedCert(t, []pkix.AttributeTypeAndValue{
+		{Type: oidUid, Value: "com.apple.mail.test"},
+	})
+	certPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert.Certificate[0]})
+	keyDER, err := x509.MarshalECPrivateKey(cert.PrivateKey.(*ecdsa.PrivateKey))
+	if err != nil {
+		t.Fatal(err)
+	}
+	keyPEM := pem.EncodeToMemory(&pem.Block{Type: "EC PRIVATE KEY", Bytes: keyDER})
+
+	certFile := filepath.Join(dir, "cert.pem")
+	keyFile := filepath.Join(dir, "key.pem")
+	if err := os.WriteFile(certFile, certPEM, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(keyFile, keyPEM, 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	cfg := &config.Config{
+		CertificateFilePem:    "cert.pem",
+		CertificateFilePemKey: "key.pem",
+		Delay:                 1,
+		CheckInterval:         60,
+	}
+	db := newInMemoryDB(t)
+
+	apns := NewApns(cfg, db)
+	if apns == nil {
+		t.Fatal("NewApns returned nil")
+	}
+	if apns.Topic != "com.apple.mail.test" {
+		t.Errorf("topic = %q, want com.apple.mail.test", apns.Topic)
+	}
+	if apns.client == nil {
+		t.Error("client not configured for PEM certificate")
+	}
+}
+
+func TestNewApnsToken(t *testing.T) {
+	dir := withConfigDir(t)
+
+	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	keyDER, err := x509.MarshalPKCS8PrivateKey(key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	keyPEM := pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: keyDER})
+	p8File := filepath.Join(dir, "AuthKey_TEST1234.p8")
+	if err := os.WriteFile(p8File, keyPEM, 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	cfg := &config.Config{
+		KeyFileP8:     "AuthKey_TEST1234.p8",
+		KeyFileKeyId:  "TEST1234",
+		KeyFileTeamId: "TEAM1234",
+		KeyFileTopic:  "com.apple.mail.test",
+		Delay:         1,
+		CheckInterval: 60,
+	}
+	db := newInMemoryDB(t)
+
+	apns := NewApns(cfg, db)
+	if apns == nil {
+		t.Fatal("NewApns returned nil")
+	}
+	if apns.Topic != "com.apple.mail.test" {
+		t.Errorf("topic = %q, want com.apple.mail.test", apns.Topic)
+	}
+	if apns.client == nil {
+		t.Error("client not configured for token authentication")
+	}
 }
 
 func TestSendNotificationDelayed(t *testing.T) {

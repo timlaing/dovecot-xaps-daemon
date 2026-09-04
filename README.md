@@ -93,9 +93,12 @@ Measure test coverage with:
 go test -cover ./...
 ```
 
-The unit-test suite covers every reachable branch across the database, configuration, APNs, and socket packages.
-Code paths that load APNS credentials from `/etc/xapsd/`, start the blocking HTTP listener, or call `log.Fatal` are
-not exercised by unit tests and are covered by the packaging and release workflows instead.
+The unit-test suite covers every reachable branch across the database, configuration, APNs, and socket packages, and
+reaches 85.4% aggregate statement coverage. The APNS credential directory (`/etc/xapsd/` by default) is overridable
+in tests to exercise `NewApns` with both PEM and token credentials. Only code paths that would block forever
+(`main()`'s HTTP listener), exit the process (`log.Fatal`), or require system state (the package-managed
+`/etc/xapsd/xapsd.yaml`) are not exercised by unit tests; those paths are covered by the packaging and release
+workflows instead.
 
 Build a Debian package
 ----------------------

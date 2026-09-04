@@ -198,3 +198,20 @@ func TestNotifyCheckParams(t *testing.T) {
 		})
 	}
 }
+
+func TestNewHttpRouter(t *testing.T) {
+	h, server := newTestSocketHandler(t)
+	defer server.Close()
+
+	router := newHttpRouter(h.db, h.apns)
+	if router == nil {
+		t.Fatal("newHttpRouter returned nil")
+	}
+
+	for _, path := range []string{"/register", "/notify"} {
+		handler, _, _ := router.Lookup(http.MethodPost, path)
+		if handler == nil {
+			t.Errorf("expected a POST handler for %s", path)
+		}
+	}
+}
