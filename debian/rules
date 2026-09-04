@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-export GOARCH = $(shell dpkg-architecture -qDEB_HOST_GNU_CPU)
+export GOARCH = $(shell dpkg-architecture -qDEB_HOST_ARCH)
 
 %:
 	dh $@
