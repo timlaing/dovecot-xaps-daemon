@@ -29,7 +29,16 @@ jobs:
           cache: true
 
       - name: Run tests with coverage
-        run: go test -coverprofile=coverage.out ./...
+        # -count=1 forces a fresh run so the coverage profile is not a stale cache.
+        # Go 1.20+ merges the per-package profiles into a single coverage.out.
+        run: go test -count=1 -coverprofile=coverage.out ./...
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: coverage
+          path: coverage.out
+          if-no-files-found: error
 
       - name: Check SonarQube credentials
         id: credentials

@@ -26,3 +26,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   covering every reachable branch; the suite passes with `go test -race`, `gofmt`, and `go vet`.
 - Ignored the local `.env` file and the regenerated `database_workingcpy.json` test artifact.
 - Added a "Development" section to the README describing the test, coverage, and verification commands.
+- Updated the SonarQube analysis to include both `cmd` and `internal` test directories and to report the aggregated
+  Go coverage, forcing a fresh coverage profile on every run.
