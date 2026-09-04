@@ -5,6 +5,10 @@ import (
 	"github.com/spf13/viper"
 )
 
+// XapsdConfigDir is the directory that holds the daemon configuration and
+// APNS credential files.
+const XapsdConfigDir = "/etc/xapsd/"
+
 var conf Config
 
 type (
@@ -36,7 +40,7 @@ func ParseConfig(configName, configPath string) {
 	if configName != "" {
 		viper.SetConfigName(configName)
 	}
-	viper.AddConfigPath("/etc/xapsd/")
+	viper.AddConfigPath(XapsdConfigDir)
 	if configPath != "" {
 		viper.AddConfigPath(configPath)
 	}

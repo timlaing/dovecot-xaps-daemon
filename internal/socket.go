@@ -37,11 +37,19 @@ type Notify struct {
 	Events   []string
 }
 
-func NewHttpSocket(config *config.Config, db *database.Database, apns *Apns) {
+// newHttpRouter builds the router that serves the daemon's HTTP endpoints.
+// It is split out from NewHttpSocket so it can be tested without binding a
+// listening socket.
+func newHttpRouter(db *database.Database, apns *Apns) *httprouter.Router {
 	router := httprouter.New()
 	httpSocket := httpHandler{db, apns}
 	router.POST("/register", httpSocket.handleRegister)
 	router.POST("/notify", httpSocket.handleNotify)
+	return router
+}
+
+func NewHttpSocket(config *config.Config, db *database.Database, apns *Apns) {
+	router := newHttpRouter(db, apns)
 	if len(config.TlsCertfile) > 0 || len(config.TlsKeyfile) > 0 {
 		go func() {
 			err := http.ListenAndServeTLS(config.TlsListenAddr+":"+config.TlsPort, config.TlsCertfile, config.TlsKeyfile, router)

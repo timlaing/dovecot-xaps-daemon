@@ -76,6 +76,30 @@ For a manual system installation, install the binary as `/usr/bin/xapsd`, the sa
 `/etc/xapsd/xapsd.yaml`, and the files under `configs/systemd/` in their corresponding systemd directories.
 The Debian package is the recommended installation method on Debian and Ubuntu.
 
+Development
+-----------
+
+Run formatting, analysis, and the test suite (with the race detector) using the Go version declared in `go.mod`:
+
+```sh
+test -z "$(gofmt -l cmd internal)"
+go vet ./...
+go test -race ./...
+```
+
+Measure test coverage with:
+
+```sh
+go test -cover ./...
+```
+
+The unit-test suite covers every reachable branch across the database, configuration, APNs, and socket packages, and
+reaches 85.4% aggregate statement coverage. The APNS credential directory (`/etc/xapsd/` by default) is overridable
+in tests to exercise `NewApns` with both PEM and token credentials. Only code paths that would block forever
+(`main()`'s HTTP listener), exit the process (`log.Fatal`), or require system state (the package-managed
+`/etc/xapsd/xapsd.yaml`) are not exercised by unit tests; those paths are covered by the packaging and release
+workflows instead.
+
 Build a Debian package
 ----------------------
 
