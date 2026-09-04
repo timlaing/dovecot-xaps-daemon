@@ -28,6 +28,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   the daemon still loads credentials from `/etc/xapsd/` by default and `NewApns`/`NewHttpSocket` keep their
   signatures, only now the unit tests can drive them from a temporary directory. This raised aggregate statement
   coverage to 85.4%.
+- Introduced the `config.XapsdConfigDir` constant so the `/etc/xapsd/` path is defined once rather than duplicated
+  across the config and APNS packages.
 - Ignored the local `.env` file and the regenerated `database_workingcpy.json` test artifact.
 - Added a "Development" section to the README describing the test, coverage, and verification commands.
 - Updated the SonarQube analysis to include both `cmd` and `internal` test directories and to report the aggregated

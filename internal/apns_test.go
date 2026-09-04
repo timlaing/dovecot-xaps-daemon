@@ -318,9 +318,6 @@ func TestCreateDelayedNotificationThread(t *testing.T) {
 
 	apns.createDelayedNotificationThread()
 
-	// let the one-second ticker fire so the goroutine body executes
-	time.Sleep(1100 * time.Millisecond)
-
 	// wait (with a timeout) for the delayed registration to be sent
 	deadline := time.Now().Add(5 * time.Second)
 	for {
