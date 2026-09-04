@@ -8,11 +8,10 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
-	"io/ioutil"
 	"math/big"
 	"net/http"
 	"net/http/httptest"
-	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -106,13 +105,9 @@ func TestTopicFromCertificate(t *testing.T) {
 
 func newInMemoryDB(t *testing.T) *database.Database {
 	t.Helper()
-	f, err := ioutil.TempFile("", "xapsd_internal_db")
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { os.Remove(f.Name()) })
+	path := filepath.Join(t.TempDir(), "database.json")
 
-	db, err := database.NewDatabase(f.Name())
+	db, err := database.NewDatabase(path)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -232,12 +227,17 @@ func TestCreateDelayedNotificationThread(t *testing.T) {
 	// let the one-second ticker fire so the goroutine body executes
 	time.Sleep(1100 * time.Millisecond)
 
+	// wait (with a timeout) for the delayed registration to be sent
+	deadline := time.Now().Add(5 * time.Second)
 	for {
 		apns.mapMutex.Lock()
 		n := len(apns.delayedApns)
 		apns.mapMutex.Unlock()
 		if n == 0 {
 			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("timed out waiting for delayed registration to be sent")
 		}
 		time.Sleep(50 * time.Millisecond)
 	}

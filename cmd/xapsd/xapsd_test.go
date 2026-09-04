@@ -14,8 +14,8 @@ func TestHashPasswordHelperProcess(t *testing.T) {
 	if os.Getenv("GO_WANT_HELPER_PROCESS") != "1" {
 		return
 	}
+	// hashPassword terminates the process via os.Exit(0)
 	hashPassword()
-	os.Exit(0)
 }
 
 func TestHashPassword(t *testing.T) {

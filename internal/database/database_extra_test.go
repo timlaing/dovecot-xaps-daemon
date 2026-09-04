@@ -1,7 +1,6 @@
 package database
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -9,13 +8,7 @@ import (
 )
 
 func TestDatabase_NewDatabaseMissingFile(t *testing.T) {
-	dir, err := ioutil.TempDir("", "xapsd_db_missing")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
-
-	path := filepath.Join(dir, "database.json")
+	path := filepath.Join(t.TempDir(), "database.json")
 	db, err := NewDatabase(path)
 	if err != nil {
 		t.Fatal("expected new database to be created, got error:", err)
@@ -29,9 +22,10 @@ func TestDatabase_NewDatabaseMissingFile(t *testing.T) {
 }
 
 func TestDatabase_NewDatabaseWriteError(t *testing.T) {
-	// file does not exist but the parent directory does not exist either,
-	// so the initial write() fails.
-	_, err := NewDatabase(filepath.Join("/nonexistent-dir-xapsd-test", "sub", "database.json"))
+	// the parent directory does not exist and its parent cannot be created,
+	// so the initial write() fails deterministically.
+	dir := t.TempDir()
+	_, err := NewDatabase(filepath.Join(dir, "missing-subdir", "database.json"))
 	if err == nil {
 		t.Fatal("expected error creating database in nonexistent directory")
 	}
@@ -39,11 +33,7 @@ func TestDatabase_NewDatabaseWriteError(t *testing.T) {
 
 func TestDatabase_NewDatabaseReadError(t *testing.T) {
 	// a directory is stat-able (so not IsNotExist) but not readable as a file
-	dir, err := ioutil.TempDir("", "xapsd_db_readerr")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	if _, err := NewDatabase(dir); err == nil {
 		t.Fatal("expected error reading a directory as a database file")
@@ -51,14 +41,8 @@ func TestDatabase_NewDatabaseReadError(t *testing.T) {
 }
 
 func TestDatabase_NewDatabaseInvalidJSON(t *testing.T) {
-	dir, err := ioutil.TempDir("", "xapsd_db_badjson")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
-
-	path := filepath.Join(dir, "database.json")
-	if err := ioutil.WriteFile(path, []byte("{ not valid json"), 0644); err != nil {
+	path := filepath.Join(t.TempDir(), "database.json")
+	if err := os.WriteFile(path, []byte("{ not valid json"), 0644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -68,14 +52,8 @@ func TestDatabase_NewDatabaseInvalidJSON(t *testing.T) {
 }
 
 func TestDatabase_NewDatabaseEmptyFile(t *testing.T) {
-	dir, err := ioutil.TempDir("", "xapsd_db_empty")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
-
-	path := filepath.Join(dir, "database.json")
-	if err := ioutil.WriteFile(path, nil, 0644); err != nil {
+	path := filepath.Join(t.TempDir(), "database.json")
+	if err := os.WriteFile(path, nil, 0644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -89,13 +67,8 @@ func TestDatabase_NewDatabaseEmptyFile(t *testing.T) {
 }
 
 func TestDatabase_AddRegistrationExistingAccount(t *testing.T) {
-	f, err := ioutil.TempFile("", "xapsd_db_addreg")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.Remove(f.Name())
-
-	db, err := NewDatabase(f.Name())
+	path := filepath.Join(t.TempDir(), "database.json")
+	db, err := NewDatabase(path)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -119,7 +92,7 @@ func TestDatabase_DeleteIfExistRegistrationWriteError(t *testing.T) {
 	// Construct a database whose backing file cannot be written so the
 	// write() inside DeleteIfExistRegistration fails.
 	db := &Database{
-		filename: filepath.Join("/nonexistent-dir-xapsd-test", "database.json"),
+		filename: filepath.Join(t.TempDir(), "missing-subdir", "database.json"),
 		Users: map[string]User{
 			"user": {
 				Accounts: map[string]Account{
@@ -140,13 +113,8 @@ func TestDatabase_DeleteIfExistRegistrationWriteError(t *testing.T) {
 }
 
 func TestDatabase_UserExists(t *testing.T) {
-	f, err := ioutil.TempFile("", "xapsd_db_userexists")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.Remove(f.Name())
-
-	db, err := NewDatabase(f.Name())
+	path := filepath.Join(t.TempDir(), "database.json")
+	db, err := NewDatabase(path)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -162,15 +130,10 @@ func TestDatabase_UserExists(t *testing.T) {
 	}
 }
 
-func TestDatabase_CleanupRegisteredWithFutureTime(t *testing.T) {
-	dir, err := ioutil.TempDir("", "xapsd_db_cleanup")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
-
+func TestDatabase_CleanupRegisteredRemovesStale(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "database.json")
 	db := &Database{
-		filename: filepath.Join(dir, "database.json"),
+		filename: path,
 		Users: map[string]User{
 			"user": {
 				Accounts: map[string]Account{
@@ -186,8 +149,8 @@ func TestDatabase_CleanupRegisteredWithFutureTime(t *testing.T) {
 	if _, exists := db.Users["user"].Accounts["old"]; exists {
 		t.Error("expected stale registration to be removed")
 	}
-	if _, exists := db.Users["user"].Accounts["fresh"]; exists {
-		// fresh should remain; the user still has one account so not removed
+	if _, exists := db.Users["user"].Accounts["fresh"]; !exists {
+		t.Error("expected fresh registration to remain")
 	}
 	if len(db.Users["user"].Accounts) != 1 {
 		t.Errorf("expected only the fresh account to remain, got %d", len(db.Users["user"].Accounts))
