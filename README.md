@@ -1,6 +1,6 @@
 [![Test](https://github.com/timlaing/dovecot-xaps-daemon/actions/workflows/test.yml/badge.svg)](https://github.com/timlaing/dovecot-xaps-daemon/actions/workflows/test.yml)
 [![Lint](https://github.com/timlaing/dovecot-xaps-daemon/actions/workflows/lint.yml/badge.svg)](https://github.com/timlaing/dovecot-xaps-daemon/actions/workflows/lint.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=timlaing_dovecot-xaps-daemon&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=timlaing_dovecot-xaps-daemon)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=timlaing_dovecot-xaps-daemon&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=timlaing_dovecot-xaps-d[...]
 [![Release](https://img.shields.io/github/v/release/timlaing/dovecot-xaps-daemon)](https://github.com/timlaing/dovecot-xaps-daemon/releases)
 [![License](https://img.shields.io/github/license/timlaing/dovecot-xaps-daemon)](LICENSE)
 
@@ -21,6 +21,14 @@ Dovecot patches and requires APNS credentials that you are legally entitled to u
 
 Installation
 ============
+
+APT Repository
+--------------
+
+The recommended installation method is via the signed APT repository at
+[dovecot-xaps-apt](https://github.com/timlaing/dovecot-xaps-apt). This repository provides pre-built packages for
+both the Dovecot plugin and the xapsd daemon, with automatic security updates. For setup instructions, see the
+[APT repository documentation](https://github.com/timlaing/dovecot-xaps-apt#client-installation).
 
 Debian package
 --------------
