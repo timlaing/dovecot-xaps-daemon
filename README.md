@@ -1,8 +1,20 @@
 [![Test](https://github.com/timlaing/dovecot-xaps-daemon/actions/workflows/test.yml/badge.svg)](https://github.com/timlaing/dovecot-xaps-daemon/actions/workflows/test.yml)
 [![Lint](https://github.com/timlaing/dovecot-xaps-daemon/actions/workflows/lint.yml/badge.svg)](https://github.com/timlaing/dovecot-xaps-daemon/actions/workflows/lint.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=timlaing_dovecot-xaps-daemon&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=timlaing_dovecot-xaps-d[...]
 [![Release](https://img.shields.io/github/v/release/timlaing/dovecot-xaps-daemon)](https://github.com/timlaing/dovecot-xaps-daemon/releases)
 [![License](https://img.shields.io/github/license/timlaing/dovecot-xaps-daemon)](LICENSE)
+
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=timlaing_dovecot-xaps-daemon&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=timlaing_dovecot-xaps-daemon)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=timlaing_dovecot-xaps-daemon&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=timlaing_dovecot-xaps-daemon)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=timlaing_dovecot-xaps-daemon&metric=coverage)](https://sonarcloud.io/summary/new_code?id=timlaing_dovecot-xaps-daemon)
+
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=timlaing_dovecot-xaps-daemon&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=timlaing_dovecot-xaps-daemon)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=timlaing_dovecot-xaps-daemon&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=timlaing_dovecot-xaps-daemon)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=timlaing_dovecot-xaps-daemon&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=timlaing_dovecot-xaps-daemon)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=timlaing_dovecot-xaps-daemon&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=timlaing_dovecot-xaps-daemon)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=timlaing_dovecot-xaps-daemon&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=timlaing_dovecot-xaps-daemon)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=timlaing_dovecot-xaps-daemon&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=timlaing_dovecot-xaps-daemon)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=timlaing_dovecot-xaps-daemon&metric=bugs)](https://sonarcloud.io/summary/new_code?id=timlaing_dovecot-xaps-daemon)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=timlaing_dovecot-xaps-daemon&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=timlaing_dovecot-xaps-daemon)
 
 iOS Push Email daemon for Dovecot
 =================================
@@ -42,9 +54,9 @@ sudo apt install ./xapsd_<version>_<architecture>.deb
 
 The installer prompts for:
 
-* The APNS topic.
-* The APNS key ID.
-* The Apple Developer team ID.
+- The APNS topic.
+- The APNS key ID.
+- The Apple Developer team ID.
 
 It derives Apple's standard key filename `AuthKey_<KeyID>.p8` and writes these settings to
 `/etc/xapsd/xapsd.yaml`. Copy the private key downloaded from Apple into that directory:
@@ -129,12 +141,12 @@ Configuration
 
 The main configuration is `/etc/xapsd/xapsd.yaml`. Important settings include:
 
-* `listenAddr` and `port`: HTTP listener used by the Dovecot plugin.
-* `databaseFile`: persistent device-registration database.
-* `keyFileP8`: APNS private-key filename under `/etc/xapsd`.
-* `keyFileTopic`: APNS topic.
-* `keyFileKeyId`: APNS key ID.
-* `keyFileTeamId`: Apple Developer team ID.
+- `listenAddr` and `port`: HTTP listener used by the Dovecot plugin.
+- `databaseFile`: persistent device-registration database.
+- `keyFileP8`: APNS private-key filename under `/etc/xapsd`.
+- `keyFileTopic`: APNS topic.
+- `keyFileKeyId`: APNS key ID.
+- `keyFileTeamId`: Apple Developer team ID.
 
 Never commit the APNS private key.
 
