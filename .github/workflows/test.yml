@@ -31,7 +31,7 @@ jobs:
 
   package:
     name: Debian package
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     timeout-minutes: 15
 
     steps:
