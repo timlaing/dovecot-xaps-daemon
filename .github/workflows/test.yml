@@ -13,7 +13,7 @@ jobs:
   test:
     strategy:
       matrix:
-        platform: [ubuntu-latest, macos-latest]
+        platform: [ubuntu-latest, ubuntu-24.04-arm]
     runs-on: ${{ matrix.platform }}
 
     steps:
@@ -31,7 +31,7 @@ jobs:
 
   package:
     name: Debian package
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     timeout-minutes: 15
 
     steps:
