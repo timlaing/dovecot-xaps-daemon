@@ -6,8 +6,6 @@ on:
   workflow_run:
     workflows: ["Lint", "Release", "Release Drafter", "SonarQube", "Test"]
     types: [completed]
-  schedule:
-    - cron: "11,26,41,56 * * * *"
   workflow_dispatch:
 
 permissions: {}
